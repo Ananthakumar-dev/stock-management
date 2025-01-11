@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Store extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'designation', 'email', 'phone', 'status'];
+    protected $fillable = ['name', 'description', 'address', 'phone'];
 
     public function inventories()
     {

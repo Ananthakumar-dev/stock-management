@@ -5,11 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Measurement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'designation', 'email', 'phone', 'status'];
+    protected $fillable = ['name'];
+
+    public function items()
+    {
+        return $this->hasMany(Item::class);
+    }
 
     public function inventories()
     {
