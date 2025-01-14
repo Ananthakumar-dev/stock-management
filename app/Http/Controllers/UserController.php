@@ -2,45 +2,75 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Status;
+use App\Enums\UserType;
+use App\Http\Requests\UserRequest;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        return User::all();
+    /**
+     * index page
+     */
+    public function index(
+        UserService $userService
+    ) {
+        $allUsers = $userService
+            ->getUsers()
+            ->where('type', UserType::User)
+            ->paginate(PAGINATION);
+
+        return Inertia::render('User/Index/Index', [
+            'users' => $allUsers
+        ]);
     }
 
-    public function store(Request $request)
+    /**
+     * user create form
+     */
+    public function create()
     {
-        $request->validate([
-            'name' => 'required|max:255',
-            'designation' => 'required|max:255',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|digits:10',
-            'status' => 'required|in:active,inactive',
+        $statuses = Status::cases();
+
+        return Inertia::render('User/Add/Index', [
+            'statuses' => $statuses
         ]);
-
-        $user = User::create($request->all());
-
-        return response()->json(['message' => 'User added successfully', 'data' => $user], 201);
     }
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|max:255',
-            'designation' => 'required|max:255',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|digits:10',
-            'status' => 'required|in:active,inactive',
+    public function store(
+        UserRequest $userRequest
+    ) {
+        $validatedFields = $userRequest->validated();
+        User::create($validatedFields);
+
+        return redirect()->route('users.index');
+    }
+
+    public function show(
+        int $id
+    ) {
+        $statuses = Status::cases();
+        $user = User::findOrFail($id);
+
+        return Inertia::render('User/Edit/Index', [
+            'statuses' => $statuses,
+            'user' => $user
         ]);
+    }
+
+    public function update(
+        UserRequest $userRequest,
+        $id
+    ) {
+        $validatedFields = $userRequest->validated();
 
         $user = User::findOrFail($id);
-        $user->update($request->all());
+        $user->update($validatedFields);
 
-        return response()->json(['message' => 'User updated successfully', 'data' => $user]);
+        return redirect()->route('users.index');
     }
 
     public function destroy($id)
@@ -48,6 +78,6 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return response()->json(['message' => 'User deleted successfully']);
+        return redirect()->route('users.index');
     }
 }

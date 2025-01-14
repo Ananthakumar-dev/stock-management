@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\Status;
+use App\Enums\UserType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,8 +20,10 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('password')->nullable();
-            $table->enum('type', ['user', 'admin'])->default('user');
-            $table->enum('status', ['active', 'inactive']);
+            $table->enum('type', array_column(
+                UserType::cases(), 'value'
+            ))->default('user');
+            $table->enum('status', array_column(Status::cases(), 'value'));
             $table->timestamps();
         });
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\InventoryType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,7 +19,10 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->integer('quantity');
             $table->unsignedBigInteger('measurement_id');
-            $table->enum('type', ['In', 'Out']);
+            $table->enum('type', array_column(
+                InventoryType::cases(),
+                'value'
+            ));
             $table->timestamps();
 
             $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade');
