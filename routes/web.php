@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\UserController;
@@ -33,6 +35,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/show/{id}', [StoreController::class, 'show'])->name('stores.show');
         Route::patch('/update/{id}', [StoreController::class, 'update'])->name('stores.update');
         Route::delete('/delete/{id}', [StoreController::class, 'destroy'])->name('stores.delete');
+    });
+
+    Route::prefix('/measurements')->group(function () {
+        Route::get('/', [MeasurementController::class, 'index'])->name('measurements.index');
+        Route::get('/create', [MeasurementController::class, 'create'])->name('measurements.create');
+        Route::post('/store', [MeasurementController::class, 'store'])->name('measurements.store');
+        Route::get('/show/{id}', [MeasurementController::class, 'show'])->name('measurements.show');
+        Route::patch('/update/{id}', [MeasurementController::class, 'update'])->name('measurements.update');
+        Route::delete('/delete/{id}', [MeasurementController::class, 'destroy'])->name('measurements.delete');
+    });
+
+    Route::prefix('/attributes')->group(function () {
+        Route::get('/', [AttributeController::class, 'index'])->name('attributes.index');
+        Route::get('/create', [AttributeController::class, 'create'])->name('attributes.create');
+        Route::post('/store', [AttributeController::class, 'store'])->name('attributes.store');
+        Route::get('/show/{id}', [AttributeController::class, 'show'])->name('attributes.show');
+        Route::patch('/update/{id}', [AttributeController::class, 'update'])->name('attributes.update');
+        Route::delete('/delete/{id}', [AttributeController::class, 'destroy'])->name('attributes.delete');
     });
 });
 

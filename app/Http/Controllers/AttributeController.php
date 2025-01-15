@@ -2,37 +2,61 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttributeRequest;
+use App\Http\Requests\AttributeUpdateRequest;
 use App\Models\Attribute;
+use App\Services\AttributeService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AttributeController extends Controller
 {
-    public function index()
-    {
-        return Attribute::all();
+    public function index(
+        AttributeService $attributeService
+    ) {
+        $allAttributes = $attributeService
+            ->getAttributes()
+            ->paginate(PAGINATION);
+
+        return Inertia::render('Attribute/Index/Index', [
+            'attributes' => $allAttributes
+        ]);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|unique:Attributes,name|max:255',
-        ]);
-
-        $Attribute = Attribute::create(['name' => $request->name]);
-
-        return response()->json(['message' => 'Attribute added successfully', 'data' => $Attribute], 201);
+    public function create() {
+        return Inertia::render('Attribute/Add/Index');
     }
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|unique:Attributes,name,' . $id . '|max:255',
+    public function store(
+        AttributeRequest $attributeRequest
+    ) {
+        $validatedFields = $attributeRequest->validated();
+
+        Attribute::create($validatedFields);
+
+        return redirect()->route('attributes.index');
+    }
+
+    public function show(
+        int $id
+    ) {
+        $attribute = Attribute::findOrFail($id);
+
+        return Inertia::render('Attribute/Edit/Index', [
+            'attribute' => $attribute
         ]);
+    }
+
+    public function update(
+        AttributeUpdateRequest $attributeUpdateRequest,
+        $id
+    ) {
+        $validatedFields = $attributeUpdateRequest->validated();
 
         $Attribute = Attribute::findOrFail($id);
-        $Attribute->update(['name' => $request->name]);
+        $Attribute->update($validatedFields);
 
-        return response()->json(['message' => 'Attribute updated successfully', 'data' => $Attribute]);
+        return redirect()->route('attributes.index');
     }
 
     public function destroy($id)
@@ -40,6 +64,6 @@ class AttributeController extends Controller
         $Attribute = Attribute::findOrFail($id);
         $Attribute->delete();
 
-        return response()->json(['message' => 'Attribute deleted successfully']);
+        return redirect()->route('attributes.index');
     }
 }

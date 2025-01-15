@@ -2,37 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MeasurementRequest;
+use App\Http\Requests\MeasurementUpdateRequest;
 use App\Models\Measurement;
+use App\Services\MeasurementService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class MeasurementController extends Controller
 {
-    public function index()
-    {
-        return Measurement::all();
+    public function index(
+        MeasurementService $measurementService
+    ) {
+        $allMeasurements = $measurementService
+            ->getMeasurements()
+            ->paginate(PAGINATION);
+
+        return Inertia::render('Measurement/Index/Index', [
+            'measurements' => $allMeasurements
+        ]);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|unique:measurements,name|max:255',
-        ]);
-
-        $measurement = Measurement::create(['name' => $request->name]);
-
-        return response()->json(['message' => 'Measurement added successfully', 'data' => $measurement], 201);
+    public function create() {
+        return Inertia::render('Measurement/Add/Index');
     }
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|unique:measurements,name,' . $id . '|max:255',
+    public function store(
+        MeasurementRequest $measurementRequest
+    ) {
+        $validatedFields = $measurementRequest->validated();
+
+        Measurement::create($validatedFields);
+
+        return redirect()->route('measurements.index');
+    }
+
+    public function show(
+        int $id
+    ) {
+        $measurement = Measurement::findOrFail($id);
+
+        return Inertia::render('Measurement/Edit/Index', [
+            'measurement' => $measurement
         ]);
+    }
+
+    public function update(
+        MeasurementUpdateRequest $measurementUpdateRequest, 
+        $id
+    )
+    {
+        $validatedFields = $measurementUpdateRequest->validated();
 
         $measurement = Measurement::findOrFail($id);
-        $measurement->update(['name' => $request->name]);
+        $measurement->update($validatedFields);
 
-        return response()->json(['message' => 'Measurement updated successfully', 'data' => $measurement]);
+        return redirect()->route('measurements.index');
     }
 
     public function destroy($id)
@@ -40,6 +65,6 @@ class MeasurementController extends Controller
         $measurement = Measurement::findOrFail($id);
         $measurement->delete();
 
-        return response()->json(['message' => 'Measurement deleted successfully']);
+        return redirect()->route('measurements.index');
     }
 }

@@ -14,6 +14,16 @@ const headerData = [
         route: "stores.index",
         label: "Store",
     },
+    {
+        key: "measurements",
+        route: "measurements.index",
+        label: "Measurements",
+    },
+    {
+        key: "attributes",
+        route: "attributes.index",
+        label: "Attributes",
+    },
 ];
 
 export default headerData;
