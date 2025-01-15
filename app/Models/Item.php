@@ -20,5 +20,9 @@ class Item extends Model
     {
         return $this->hasMany(Inventory::class);
     }
-}
 
+    public function item_attributes()
+    {
+        return $this->hasMany(ItemAttribute::class);
+    }
+}

@@ -3,7 +3,7 @@ import Form from "./Form";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 
-const Index = ({ store }) => {
+const Index = ({ item, measurements }) => {
     return (
         <AuthenticatedLayout
             header={
@@ -17,7 +17,7 @@ const Index = ({ store }) => {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
-                        <Form store={store} />
+                        <Form item={item} measurements={measurements} />
                     </div>
                 </div>
             </div>

@@ -2,15 +2,15 @@ import NavLink from "@/Components/NavLink";
 import { useForm } from "@inertiajs/react";
 import React from "react";
 
-const Table = ({ stores }) => {
+const Table = ({ items }) => {
     const { delete: destroy } = useForm({});
 
-    const handleDelete = (storeId) => {
-        if(!storeId) return false;
+    const handleDelete = (itemId) => {
+        if(!itemId) return false;
 
         const confimation = confirm('Are you sure want to delete? This process is irreversible.');
         if(confimation) {
-            destroy(route('stores.delete', storeId));
+            destroy(route('items.delete', itemId));
         }
     }
 
@@ -18,16 +18,16 @@ const Table = ({ stores }) => {
         <>
             {/* Top section: Add button and search box */}
             <div className="text-right">
-                <NavLink href={route("stores.create")}>
-                    Add Store
+                <NavLink href={route("items.create")}>
+                    Add Item
                 </NavLink>
             </div>
 
             {/* No results found */}
-            {!stores.total && <h1 className="text-center">No stores found!</h1>}
+            {!items.total && <h1 className="text-center">No items found!</h1>}
 
             {/* Table Section */}
-            {stores.total && (
+            {items.total && (
                 <>
                     <input
                         type="text"
@@ -43,7 +43,10 @@ const Table = ({ stores }) => {
                                         Name
                                     </th>
                                     <th className="border border-gray-300 px-4 py-2 text-left">
-                                        Phone
+                                        Quantity
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">
+                                        Availability
                                     </th>
                                     <th className="border border-gray-300 px-4 py-2 text-center">
                                         Actions
@@ -52,29 +55,32 @@ const Table = ({ stores }) => {
                             </thead>
                             <tbody>
                                 {/* Example rows */}
-                                {stores.data.map((store) => (
+                                {items.data.map((item) => (
                                     <tr
-                                        key={store.id}
+                                        key={item.id}
                                         className="odd:bg-white even:bg-gray-100"
                                     >
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {store.name}
+                                            {item.name}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {store.phone || "N/A"}
+                                            {item.quantity} {item.measurement_name}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {item.availability == 1 ? 'Available' : 'Not Available'}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2 text-center">
                                             <button
                                                 className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2"
                                             >
-                                                <NavLink href={`/stores/show/${store.id}`}>
+                                                <NavLink href={`/items/show/${item.id}`}>
                                                     Edit
                                                 </NavLink>
                                             </button>
 
                                             <button
                                                 onClick={() =>
-                                                    handleDelete(store.id)
+                                                    handleDelete(item.id)
                                                 }
                                                 className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                                             >
@@ -89,7 +95,7 @@ const Table = ({ stores }) => {
 
                     {/* Pagination Section */}
                     <div className="mt-4 flex justify-center">
-                        {stores.links.map((link, index) => (
+                        {items.links.map((link, index) => (
                             <NavLink
                                 key={index}
                                 href={link.url}

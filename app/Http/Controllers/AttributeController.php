@@ -66,4 +66,17 @@ class AttributeController extends Controller
 
         return redirect()->route('attributes.index');
     }
+
+    public function get(
+        AttributeService $attributeService
+    )
+    {
+        $allAttributes = $attributeService
+            ->getAttributes()
+            ->get();
+
+        return [
+            'attributes' => $allAttributes
+        ];
+    }
 }

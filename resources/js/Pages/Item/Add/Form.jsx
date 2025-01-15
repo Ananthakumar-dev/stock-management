@@ -1,26 +1,30 @@
-import React from "react";
+import { useState } from "react";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
-import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
 import PrimaryButton from "@/Components/PrimaryButton";
+import Attributes from "./Attributes";
+import { router } from '@inertiajs/react';
 
-const Form = () => {
-    const { data, setData, post, errors, processing, recentlySuccessful } =
-        useForm({
-            name: '',
-            description: '',
-            phone: '',
-            block: '',
-            street: '',
-            city: '',
-        });
+const Form = ({ measurements }) => {
+    const [errors, setErrors] = useState({}); // Validation errors
 
-    const submit = (e) => {
+    const submit = async (e) => {
         e.preventDefault();
 
-        post(route('stores.store'));
+        setErrors({});
+        const data = new FormData(e.target);
+        const url = route("items.store");
+        const indexUrl = route("items.index");
+
+        try {
+            const response = await axios.post(url, data);
+                
+        } catch (error) {
+            if (error.response && error.response.data.errors) {
+                setErrors(error.response.data.errors); // Capture validation errors
+            }
+        }
     };
 
     return (
@@ -31,9 +35,8 @@ const Form = () => {
 
                     <TextInput
                         id="name"
+                        name="name"
                         className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData("name", e.target.value)}
                         required
                         isFocused
                         autoComplete="name"
@@ -47,91 +50,83 @@ const Form = () => {
 
                     <TextInput
                         id="description"
+                        name="description"
                         type="description"
                         className="mt-1 block w-full"
-                        value={data.description}
-                        onChange={(e) => setData("description", e.target.value)}
                         required
                     />
 
                     <InputError className="mt-2" message={errors.description} />
                 </div>
 
-                <div>
-                    <InputLabel htmlFor="phone" value="phone" />
+                <div className="flex gap-1">
+                    <div>
+                        <InputLabel htmlFor="quantity" value="quantity" />
 
-                    <TextInput
-                        id="phone"
-                        type="tel"
-                        className="mt-1 block w-full"
-                        value={data.phone}
-                        onChange={(e) => setData("phone", e.target.value)}
-                        required
-                        autoComplete="username"
-                    />
+                        <TextInput
+                            id="quantity"
+                            name="quantity"
+                            type="number"
+                            className="mt-1 flex-grow"
+                            required
+                            autoComplete="username"
+                        />
 
-                    <InputError className="mt-2" message={errors.phone} />
+                        <InputError
+                            className="mt-2"
+                            message={errors.quantity}
+                        />
+                    </div>
+
+                    <div>
+                        <InputLabel htmlFor="measurement" value="Measurement" />
+
+                        <select
+                            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600 mt-1"
+                            name="measurement_id"
+                            required
+                        >
+                            <option value="">Select</option>
+                            {measurements.map((measurement) => (
+                                <option
+                                    key={measurement.id}
+                                    value={measurement.id}
+                                >
+                                    {measurement.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <InputError
+                            className="mt-2"
+                            message={errors.measurement_id}
+                        />
+                    </div>
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="block" value="Block" />
+                    <InputLabel htmlFor="availability" value="Availability" />
 
-                    <TextInput
-                        id="block"
-                        type="number"
-                        className="mt-1"
-                        value={data.block}
-                        onChange={(e) => setData("block", e.target.value)}
+                    <select
+                        className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600 mt-1 w-full"
+                        name="availability"
                         required
-                    />
+                    >
+                        <option value="">Select</option>
+                        <option value="1">Available</option>
+                        <option value="0">Not Available</option>
+                    </select>
 
-                    <InputError className="mt-2" message={errors.block} />
+                    <InputError
+                        className="mt-2"
+                        message={errors.availability}
+                    />
                 </div>
 
-                <div>
-                    <InputLabel htmlFor="street" value="Street" />
-
-                    <TextInput
-                        id="street"
-                        type="text"
-                        className="mt-1"
-                        value={data.street}
-                        onChange={(e) => setData("street", e.target.value)}
-                        required
-                    />
-
-                    <InputError className="mt-2" message={errors.street} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="city" value="City" />
-
-                    <TextInput
-                        id="city"
-                        type="text"
-                        className="mt-1"
-                        value={data.city}
-                        onChange={(e) => setData("city", e.target.value)}
-                        required
-                    />
-
-                    <InputError className="mt-2" message={errors.city} />
-                </div>
+                <Attributes errors={errors} setErrors={setErrors} />
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Saved.
-                        </p>
-                    </Transition>
+                    <PrimaryButton>Save</PrimaryButton>
                 </div>
             </form>
         </section>

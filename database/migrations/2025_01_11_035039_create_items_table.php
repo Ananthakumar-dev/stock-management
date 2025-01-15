@@ -18,7 +18,6 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->integer('quantity')->default(0);
             $table->unsignedBigInteger('measurement_id');
-            $table->text('attributes')->nullable(); // Store comma-separated attribute IDs
             $table->enum('availability', array_column(
                 Availability::cases(), 'value'
             )); // 1 - available, 0 - not available

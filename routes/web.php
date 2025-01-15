@@ -6,6 +6,7 @@ use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -53,6 +54,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/show/{id}', [AttributeController::class, 'show'])->name('attributes.show');
         Route::patch('/update/{id}', [AttributeController::class, 'update'])->name('attributes.update');
         Route::delete('/delete/{id}', [AttributeController::class, 'destroy'])->name('attributes.delete');
+
+        Route::get('/attributes', [AttributeController::class, 'get'])->name('attributes.get');
+    });
+
+    Route::prefix('/items')->group(function () {
+        Route::get('/', [ItemController::class, 'index'])->name('items.index');
+        Route::get('/create', [ItemController::class, 'create'])->name('items.create');
+        Route::post('/store', [ItemController::class, 'store'])->name('items.store');
+        Route::get('/show/{id}', [ItemController::class, 'show'])->name('items.show');
+        Route::patch('/update/{id}', [ItemController::class, 'update'])->name('items.update');
+        Route::delete('/delete/{id}', [ItemController::class, 'destroy'])->name('items.delete');
     });
 });
 
