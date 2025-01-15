@@ -2,43 +2,85 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRequest;
 use App\Models\Store;
+use App\Services\StoreService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Inertia\Inertia;
 
 class StoreController extends Controller
 {
-    public function index()
-    {
-        return Store::all();
+    public function index(
+        StoreService $storeService
+    ) {
+        $allStores = $storeService
+            ->getStores()
+            ->paginate(PAGINATION);
+
+        return Inertia::render('Store/Index/Index', [
+            'stores' => $allStores
+        ]);
     }
 
-    public function store(Request $request)
+    /**
+     * store create form
+     */
+    public function create()
     {
-        $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'required',
-            'address' => 'required',
-            'phone' => 'nullable|digits:10',
-        ]);
-
-        $store = Store::create($request->all());
-
-        return response()->json(['message' => 'Store added successfully', 'data' => $store], 201);
+        return Inertia::render('Store/Add/Index');
     }
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'required',
-            'address' => 'required',
-            'phone' => 'nullable|digits:10',
+    public function store(
+        StoreRequest $storeRequest
+    ) {
+        $validatedFields = $storeRequest->validated();
+        $validatedFields['address'] = [
+            'block' => $validatedFields['block'],
+            'street' => $validatedFields['street'],
+            'city' => $validatedFields['city'],
+        ];
+
+        Store::create(
+            Arr::only(
+                $validatedFields,
+                ['name', 'description', 'address', 'phone']
+            )
+        );
+
+        return redirect()->route('stores.index');
+    }
+
+    public function show(
+        int $id
+    ) {
+        $store = Store::findOrFail($id);
+
+        return Inertia::render('Store/Edit/Index', [
+            'store' => $store
         ]);
+    }
+
+    public function update(
+        StoreRequest $storeRequest,
+        $id
+    ) {
+        $validatedFields = $storeRequest->validated();
+        $validatedFields['address'] = [
+            'block' => $validatedFields['block'],
+            'street' => $validatedFields['street'],
+            'city' => $validatedFields['city'],
+        ];
 
         $store = Store::findOrFail($id);
-        $store->update($request->all());
+        $store->update(
+            Arr::only(
+                $validatedFields,
+                ['name', 'description', 'address', 'phone']
+            )
+        );
 
-        return response()->json(['message' => 'Store updated successfully', 'data' => $store]);
+        return redirect()->route('stores.index');
     }
 
     public function destroy($id)
@@ -46,6 +88,6 @@ class StoreController extends Controller
         $store = Store::findOrFail($id);
         $store->delete();
 
-        return response()->json(['message' => 'Store deleted successfully']);
+        return redirect()->route('stores.index');
     }
 }

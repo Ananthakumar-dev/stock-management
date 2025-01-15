@@ -137,6 +137,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         {headerData.map((el) => {
                             return (
                                 <ResponsiveNavLink
+                                    key={el.key}
                                     href={route(el.route)}
                                     active={route().current(el.route)}
                                 >
