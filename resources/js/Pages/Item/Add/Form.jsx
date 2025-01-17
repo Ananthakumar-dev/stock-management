@@ -19,7 +19,7 @@ const Form = ({ measurements }) => {
 
         try {
             const response = await axios.post(url, data);
-                
+            router.visit(indexUrl);
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors); // Capture validation errors

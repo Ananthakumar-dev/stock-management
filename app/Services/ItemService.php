@@ -55,4 +55,40 @@ class ItemService
 
         return true;
     }
+
+    /**
+     * update item
+     */
+    public function update(
+        $validatedFields,
+        $itemId
+    ) {
+        $item = Item::where('id', $itemId)->update(
+            Arr::except(
+                $validatedFields,
+                ['attributes']
+            )
+        );
+
+        if (isset($validatedFields['attributes']) && count($validatedFields['attributes'])) {
+            foreach ($validatedFields['attributes'] as $attr) {
+                $attrFound = DB::table('item_attributes')
+                    ->where(['id' => $attr['id'], 'item_id' => $itemId]);
+
+                if (!$attrFound->count()) {
+                    DB::table('item_attributes')->insert([
+                        'item_id' => $item->id,
+                        'attribute_id' => $attr['id'],
+                        'value' => $attr['value']
+                    ]);
+                } else {
+                    DB::table('item_attributes')
+                        ->where(['id' => $attr['id'], 'item_id' => $itemId])
+                        ->update(['value' => $attr['value']]);
+                }
+            }
+        }
+
+        return true;
+    }
 }

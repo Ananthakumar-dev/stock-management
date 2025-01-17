@@ -63,12 +63,13 @@ class ItemController extends Controller
 
     public function update(
         ItemRequest $itemRequest,
+        ItemService $itemService,
         $id
     ) {
         $validatedFields = $itemRequest->validated();
-        dd($validatedFields);
+        $itemService->update($validatedFields, $id);
 
-        return redirect()->route('items.index');
+        return true;
     }
 
     public function destroy($id)

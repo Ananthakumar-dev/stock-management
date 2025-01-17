@@ -18,7 +18,8 @@ const Form = ({ item, measurements }) => {
         setErrors({});
 
         const data = new FormData(e.target);
-        const url = route("items.update");
+        const url = route("items.update", item.id);
+        const indexUrl = route("items.index");
 
         try {
             const response = await axios.post(url, data);
@@ -55,6 +56,7 @@ const Form = ({ item, measurements }) => {
                     <TextInput
                         id="description"
                         type="description"
+                        name="description"
                         className="mt-1 block w-full"
                         defaultValue={item.description}
                         required
@@ -108,6 +110,26 @@ const Form = ({ item, measurements }) => {
                             message={errors.measurement_id}
                         />
                     </div>
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="availability" value="Availability" />
+
+                    <select
+                        className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600 mt-1 w-full"
+                        name="availability"
+                        defaultValue={item.availability}
+                        required
+                    >
+                        <option value="">Select</option>
+                        <option value="1">Available</option>
+                        <option value="0">Not Available</option>
+                    </select>
+
+                    <InputError
+                        className="mt-2"
+                        message={errors.availability}
+                    />
                 </div>
 
                 <Attributes

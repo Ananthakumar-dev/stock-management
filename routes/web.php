@@ -63,7 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create', [ItemController::class, 'create'])->name('items.create');
         Route::post('/store', [ItemController::class, 'store'])->name('items.store');
         Route::get('/show/{id}', [ItemController::class, 'show'])->name('items.show');
-        Route::patch('/update/{id}', [ItemController::class, 'update'])->name('items.update');
+        Route::post('/update/{id}', [ItemController::class, 'update'])->name('items.update');
         Route::delete('/delete/{id}', [ItemController::class, 'destroy'])->name('items.delete');
     });
 });

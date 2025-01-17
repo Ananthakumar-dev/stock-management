@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const Attributes = ({ errors, setErrors, itemAttributes }) => {
-    console.log(itemAttributes)
+    console.log(itemAttributes);
     const [attributes, setAttributes] = useState([]);
     const [selectedAttributes, setSelectedAttributes] = useState([]);
 
@@ -72,10 +72,15 @@ const Attributes = ({ errors, setErrors, itemAttributes }) => {
             {selectedAttributes.map((attr, index) => (
                 <div key={index} className="flex items-center mb-2">
                     <select
-                        value={attr.id}
+                        value={attr.attribute_id}
                         onChange={(e) =>
-                            handleAttributeChange(index, "id", e.target.value)
+                            handleAttributeChange(
+                                attr.attribute_id,
+                                "id",
+                                e.target.value
+                            )
                         }
+                        name={`attributes[${index}][id]`}
                         className={`border ${
                             errors[`attributes.${index}.id`]
                                 ? "border-red-500"
@@ -99,6 +104,7 @@ const Attributes = ({ errors, setErrors, itemAttributes }) => {
                                 e.target.value
                             )
                         }
+                        name={`attributes[${index}][value]`}
                         placeholder="Value"
                         className={`border ${
                             errors[`attributes.${index}.value`]
@@ -125,13 +131,16 @@ const Attributes = ({ errors, setErrors, itemAttributes }) => {
                     )}
                 </div>
             ))}
-            <button
-                type="button"
-                onClick={addAttribute}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-                Add Attribute
-            </button>
+
+            {selectedAttributes.length < attributes.length && (
+                <button
+                    type="button"
+                    onClick={addAttribute}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    Add Attribute
+                </button>
+            )}
         </div>
     );
 };
