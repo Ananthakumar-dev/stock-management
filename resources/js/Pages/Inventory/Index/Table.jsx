@@ -2,15 +2,15 @@ import NavLink from "@/Components/NavLink";
 import { useForm } from "@inertiajs/react";
 import React from "react";
 
-const Table = ({ stores }) => {
+const Table = ({ inventories }) => {
     const { delete: destroy } = useForm({});
 
-    const handleDelete = (storeId) => {
-        if(!storeId) return false;
+    const handleDelete = (inventoryId) => {
+        if(!inventoryId) return false;
 
         const confimation = confirm('Are you sure want to delete? This process is irreversible.');
         if(confimation) {
-            destroy(route('stores.delete', storeId));
+            destroy(route('inventories.delete', inventoryId));
         }
     }
 
@@ -18,16 +18,16 @@ const Table = ({ stores }) => {
         <>
             {/* Top section: Add button and search box */}
             <div className="text-right">
-                <NavLink href={route("stores.create")}>
-                    Add Store
+                <NavLink href={route("inventories.create")}>
+                    Add inventory
                 </NavLink>
             </div>
 
             {/* No results found */}
-            {!stores.total && <h1 className="text-center">No stores found!</h1>}
+            {!inventories.total && <h1 className="text-center">No inventories found!</h1>}
 
             {/* Table Section */}
-            {stores.total && (
+            {inventories.total && (
                 <>
                     <input
                         type="text"
@@ -40,10 +40,19 @@ const Table = ({ stores }) => {
                             <thead>
                                 <tr className="bg-gray-200">
                                     <th className="border border-gray-300 px-4 py-2 text-left">
-                                        Name
+                                        Item Name
                                     </th>
                                     <th className="border border-gray-300 px-4 py-2 text-left">
-                                        Phone
+                                        Store Name
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">
+                                        User Name
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">
+                                        Quantity
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">
+                                        Type
                                     </th>
                                     <th className="border border-gray-300 px-4 py-2 text-center">
                                         Actions
@@ -52,29 +61,38 @@ const Table = ({ stores }) => {
                             </thead>
                             <tbody>
                                 {/* Example rows */}
-                                {stores.data.map((store) => (
+                                {inventories.data.map((inventory) => (
                                     <tr
-                                        key={store.id}
+                                        key={inventory.id}
                                         className="odd:bg-white even:bg-gray-100"
                                     >
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {store.name}
+                                            {inventory.item_name}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {store.phone || "N/A"}
+                                            {inventory.store_name}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {inventory.user_name}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {inventory.quantity}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {inventory.type}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2 text-center">
                                             <button
                                                 className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2"
                                             >
-                                                <NavLink href={`/stores/show/${store.id}`}>
+                                                <NavLink href={`/inventories/show/${inventory.id}`}>
                                                     Edit
                                                 </NavLink>
                                             </button>
 
                                             <button
                                                 onClick={() =>
-                                                    handleDelete(store.id)
+                                                    handleDelete(inventory.id)
                                                 }
                                                 className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                                             >
@@ -89,7 +107,7 @@ const Table = ({ stores }) => {
 
                     {/* Pagination Section */}
                     <div className="mt-4 flex justify-center">
-                        {stores.links.map((link, index) => (
+                        {inventories.links.map((link, index) => (
                             <NavLink
                                 key={index}
                                 href={link.url}

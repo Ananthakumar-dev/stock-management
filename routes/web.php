@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StoreController;
@@ -65,6 +66,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/show/{id}', [ItemController::class, 'show'])->name('items.show');
         Route::post('/update/{id}', [ItemController::class, 'update'])->name('items.update');
         Route::delete('/delete/{id}', [ItemController::class, 'destroy'])->name('items.delete');
+    });
+
+    Route::prefix('/inventories')->group(function () {
+        Route::get('/', [InventoryController::class, 'index'])->name('inventories.index');
+        Route::get('/create', [InventoryController::class, 'create'])->name('inventories.create');
+        Route::post('/store', [InventoryController::class, 'store'])->name('inventories.store');
+        Route::get('/show/{id}', [InventoryController::class, 'show'])->name('inventories.show');
+        Route::post('/update/{id}', [InventoryController::class, 'update'])->name('inventories.update');
+        Route::delete('/delete/{id}', [InventoryController::class, 'destroy'])->name('inventories.delete');
+
+        Route::get('/basicData', [InventoryController::class, 'basicData'])->name('inventories.basicData');
+        Route::get('/itemDetails/{id}', [InventoryController::class, 'itemDetails'])->name('inventories.itemDetails');
     });
 });
 

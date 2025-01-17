@@ -29,6 +29,11 @@ const headerData = [
         route: "items.index",
         label: "Items",
     },
+    {
+        key: "inventories",
+        route: "inventories.index",
+        label: "Inventory",
+    },
 ];
 
 export default headerData;

@@ -18,7 +18,6 @@ return new class extends Migration
             $table->unsignedBigInteger('store_id');
             $table->unsignedBigInteger('user_id');
             $table->integer('quantity');
-            $table->unsignedBigInteger('measurement_id');
             $table->enum('type', array_column(
                 InventoryType::cases(),
                 'value'
