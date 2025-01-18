@@ -23,7 +23,7 @@ class DashboardController extends Controller
     public function stats()
     {
         return response()->json([
-            'users' => DB::table('users')->count(),
+            'users' => DB::table('users')->where('type', 'User')->count(),
             'stores' => DB::table('stores')->count(),
             'items' => DB::table('items')->count(),
             'inventories' => DB::table('inventories')->count(),

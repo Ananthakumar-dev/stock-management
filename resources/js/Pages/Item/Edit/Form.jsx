@@ -66,14 +66,14 @@ const Form = ({ item, measurements }) => {
                 </div>
 
                 <div className="flex gap-1">
-                    <div>
+                    <div className="flex-grow">
                         <InputLabel htmlFor="quantity" value="quantity" />
 
                         <TextInput
                             id="quantity"
                             name="quantity"
                             type="number"
-                            className="mt-1 flex-grow"
+                            className="mt-1 w-full"
                             required
                             autoComplete="username"
                             defaultValue={item.quantity}
@@ -85,11 +85,11 @@ const Form = ({ item, measurements }) => {
                         />
                     </div>
 
-                    <div>
+                    <div className="flex-grow">
                         <InputLabel htmlFor="measurement" value="Measurement" />
 
                         <select
-                            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600 mt-1"
+                            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600 mt-1 w-full"
                             name="measurement_id"
                             defaultValue={item.measurement_id}
                             required

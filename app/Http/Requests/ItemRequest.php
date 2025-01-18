@@ -32,4 +32,15 @@ class ItemRequest extends FormRequest
             'availability' => 'required|in:0,1',
         ];
     }
+
+    /**
+     * custom messages
+     */
+    public function messages()
+    {
+        return [
+            'attributes.*.id' => 'Attribute is required',
+            'attributes.*.value' => 'Attribute value is required',
+        ];
+    }
 }

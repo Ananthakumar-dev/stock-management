@@ -73,49 +73,51 @@ const Form = ({ store }) => {
                     <InputError className="mt-2" message={errors.phone} />
                 </div>
 
-                <div>
-                    <InputLabel htmlFor="block" value="Block" />
+                <div className="flex gap-1">
+                    <div className="flex-grow">
+                        <InputLabel htmlFor="block" value="Block" />
 
-                    <TextInput
-                        id="block"
-                        type="number"
-                        className="mt-1"
-                        value={data.block}
-                        onChange={(e) => setData("block", e.target.value)}
-                        required
-                    />
+                        <TextInput
+                            id="block"
+                            type="number"
+                            className="mt-1 w-full"
+                            value={data.block}
+                            onChange={(e) => setData("block", e.target.value)}
+                            required
+                        />
 
-                    <InputError className="mt-2" message={errors.block} />
-                </div>
+                        <InputError className="mt-2" message={errors.block} />
+                    </div>
 
-                <div>
-                    <InputLabel htmlFor="street" value="Street" />
+                    <div className="flex-grow">
+                        <InputLabel htmlFor="street" value="Street" />
 
-                    <TextInput
-                        id="street"
-                        type="text"
-                        className="mt-1"
-                        value={data.street}
-                        onChange={(e) => setData("street", e.target.value)}
-                        required
-                    />
+                        <TextInput
+                            id="street"
+                            type="text"
+                            className="mt-1 w-full"
+                            value={data.street}
+                            onChange={(e) => setData("street", e.target.value)}
+                            required
+                        />
 
-                    <InputError className="mt-2" message={errors.street} />
-                </div>
+                        <InputError className="mt-2" message={errors.street} />
+                    </div>
 
-                <div>
-                    <InputLabel htmlFor="city" value="City" />
+                    <div className="flex-grow">
+                        <InputLabel htmlFor="city" value="City" />
 
-                    <TextInput
-                        id="city"
-                        type="text"
-                        className="mt-1"
-                        value={data.city}
-                        onChange={(e) => setData("city", e.target.value)}
-                        required
-                    />
+                        <TextInput
+                            id="city"
+                            type="text"
+                            className="mt-1 w-full"
+                            value={data.city}
+                            onChange={(e) => setData("city", e.target.value)}
+                            required
+                        />
 
-                    <InputError className="mt-2" message={errors.city} />
+                        <InputError className="mt-2" message={errors.city} />
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-4">

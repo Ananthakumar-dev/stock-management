@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 const dashboardStatusUrl = route("dashboard.stats");
 const Index = () => {
     const [stats, useStats] = useState({
-        users: 0, // Total number of users
-        stores: 0, // Total number of stores
-        items: 0, // Total number of items
-        inventories: 0, // Total number of inventories
+        users: '-', // Total number of users
+        stores: '-', // Total number of stores
+        items: '-', // Total number of items
+        inventories: '-', // Total number of inventories
     });
 
     useEffect(() => {

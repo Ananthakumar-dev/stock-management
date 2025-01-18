@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\InventoryRequest;
+use App\Models\Inventory;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -73,5 +74,16 @@ class InventoryController extends Controller
         $id
     ) {
         return $this->inventoryService->getItemDetails($id);
+    }
+
+    public function destroy($id)
+    {
+        // Find the inventory record
+        $inventory = Inventory::findOrFail($id);
+
+        // Delete the inventory record
+        $inventory->delete();
+
+        return redirect()->route('inventories.index');
     }
 }

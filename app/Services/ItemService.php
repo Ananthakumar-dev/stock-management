@@ -48,7 +48,9 @@ class ItemService
                 DB::table('item_attributes')->insert([
                     'item_id' => $item->id,
                     'attribute_id' => $attr['id'],
-                    'value' => $attr['value']
+                    'value' => $attr['value'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
         }
@@ -71,24 +73,47 @@ class ItemService
         );
 
         if (isset($validatedFields['attributes']) && count($validatedFields['attributes'])) {
-            foreach ($validatedFields['attributes'] as $attr) {
-                $attrFound = DB::table('item_attributes')
-                    ->where(['id' => $attr['id'], 'item_id' => $itemId]);
-
-                if (!$attrFound->count()) {
-                    DB::table('item_attributes')->insert([
-                        'item_id' => $item->id,
-                        'attribute_id' => $attr['id'],
-                        'value' => $attr['value']
-                    ]);
-                } else {
-                    DB::table('item_attributes')
-                        ->where(['id' => $attr['id'], 'item_id' => $itemId])
-                        ->update(['value' => $attr['value']]);
-                }
-            }
+            $this->updateAttributes($itemId, $validatedFields['attributes']);
         }
 
         return true;
+    }
+
+    public function updateAttributes($itemId, $attributes)
+    {
+        // Fetch existing attributes for the item
+        $existingAttributes = DB::table('item_attributes')
+            ->where('item_id', $itemId)
+            ->pluck('id', 'attribute_id') // Key: attribute_id, Value: id
+            ->toArray();
+
+        $attributeIdsInRequest = collect($attributes)->pluck('attribute_id')->all();
+
+        // 1. Remove attributes not present in the request
+        DB::table('item_attributes')
+            ->where('item_id', $itemId)
+            ->whereNotIn('attribute_id', $attributeIdsInRequest)
+            ->delete();
+
+        foreach ($attributes as $attribute) {
+            if (isset($existingAttributes[$attribute['attribute_id']])) {
+                // 2. Update existing attribute
+                DB::table('item_attributes')
+                    ->where('id', $existingAttributes[$attribute['attribute_id']])
+                    ->update([
+                        'value' => $attribute['value'],
+                        'updated_at' => now(),
+                    ]);
+            } else {
+                // 3. Insert new attribute
+                DB::table('item_attributes')->insert([
+                    'item_id' => $itemId,
+                    'attribute_id' => $attribute['attribute_id'],
+                    'value' => $attribute['value'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
     }
 }

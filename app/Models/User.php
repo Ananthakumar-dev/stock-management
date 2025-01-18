@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'designation', 'email', 'phone', 'status'];
+    protected $fillable = ['name', 'designation', 'email', 'phone', 'status', 'password'];
 
     public function inventories()
     {

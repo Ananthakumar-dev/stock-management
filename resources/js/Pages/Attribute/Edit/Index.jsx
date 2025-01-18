@@ -8,11 +8,11 @@ const Index = ({ attribute }) => {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Add Attribute
+                    Edit Attribute
                 </h2>
             }
         >
-            <Head title="Add attribute" />
+            <Head title="Edit Attribute" />
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">

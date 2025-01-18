@@ -1,22 +1,33 @@
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import SecondaryButton from "@/Components/SecondaryButton";
 import { useState, useEffect } from "react";
 
 const Attributes = ({ errors, setErrors, itemAttributes }) => {
-    console.log(itemAttributes);
-    const [attributes, setAttributes] = useState([]);
-    const [selectedAttributes, setSelectedAttributes] = useState([]);
+    const [attributes, setAttributes] = useState([]); // Available attributes
+    const [selectedAttributes, setSelectedAttributes] = useState([]); // User-selected attributes (existing + new)
 
     // Fetch data for the item being edited
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setSelectedAttributes(itemAttributes || []); // Pre-fill attributes
+                // Pre-fill attributes from the database
+                setSelectedAttributes(
+                    itemAttributes.map((attr) => ({
+                        id: attr.id, // `item_attributes.id` (from database)
+                        attribute_id: attr.attribute_id, // Attribute ID
+                        value: attr.value, // Value
+                        existing: true, // Mark as existing
+                    }))
+                );
 
-                const getAttributes = route("attributes.get");
-                const attributesResponse = await axios.get(getAttributes);
-
-                setAttributes(attributesResponse.data?.attributes);
+                // Fetch all attributes from the backend
+                const attributesResponse = await axios.get(
+                    route("attributes.get")
+                );
+                setAttributes(attributesResponse.data?.attributes || []);
             } catch (error) {
-                console.error("Error fetching data", error);
+                console.error("Error fetching attributes", error);
             }
         };
 
@@ -24,13 +35,25 @@ const Attributes = ({ errors, setErrors, itemAttributes }) => {
     }, []);
 
     const addAttribute = () => {
-        setSelectedAttributes([...selectedAttributes, { id: "", value: "" }]);
+        // Prevent adding more attributes than available
+        if (selectedAttributes.length < attributes.length) {
+            setSelectedAttributes([
+                ...selectedAttributes,
+                { id: null, attribute_id: "", value: "", existing: false }, // New attribute
+            ]);
+        }
     };
 
     const removeAttribute = (index) => {
         const updatedAttributes = [...selectedAttributes];
         updatedAttributes.splice(index, 1);
         setSelectedAttributes(updatedAttributes);
+
+        // Clear errors for the removed attribute
+        const updatedErrors = { ...errors };
+        delete updatedErrors[`attributes.${index}.attribute_id`];
+        delete updatedErrors[`attributes.${index}.value`];
+        setErrors(updatedErrors);
     };
 
     const handleAttributeChange = (index, field, value) => {
@@ -51,95 +74,106 @@ const Attributes = ({ errors, setErrors, itemAttributes }) => {
             }
         }
 
-        // Clear errors for the current field if fixed
-        if (errors[`attributes.${index}.${field}`]) {
-            const updatedErrors = { ...errors };
-            delete updatedErrors[`attributes.${index}.${field}`];
-            setErrors(updatedErrors);
-        }
-
-        // Update attributes
+        // Update the attribute's value
         const updatedAttributes = [...selectedAttributes];
         updatedAttributes[index][field] = value;
+
+        // If it's a new attribute, ensure 'id' is set to null for new records
+        if (!updatedAttributes[index].id) {
+            updatedAttributes[index].id = null;
+        }
+
         setSelectedAttributes(updatedAttributes);
     };
 
     return (
         <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-                Attributes
-            </label>
+            <InputLabel
+                htmlFor="attributes"
+                value="Attributes (Optional)"
+                className="mb-1"
+            />
+
             {selectedAttributes.map((attr, index) => (
                 <div key={index} className="flex items-center mb-2">
-                    <select
-                        value={attr.attribute_id}
-                        onChange={(e) =>
-                            handleAttributeChange(
-                                attr.attribute_id,
-                                "id",
-                                e.target.value
-                            )
-                        }
-                        name={`attributes[${index}][id]`}
-                        className={`border ${
-                            errors[`attributes.${index}.id`]
-                                ? "border-red-500"
-                                : "border-gray-300"
-                        } rounded px-4 py-2 mr-2`}
-                    >
-                        <option value="">Select Attribute</option>
-                        {attributes.map((attribute) => (
-                            <option key={attribute.id} value={attribute.id}>
-                                {attribute.name}
-                            </option>
-                        ))}
-                    </select>
-                    <input
-                        type="text"
-                        value={attr.value}
-                        onChange={(e) =>
-                            handleAttributeChange(
-                                index,
-                                "value",
-                                e.target.value
-                            )
-                        }
-                        name={`attributes[${index}][value]`}
-                        placeholder="Value"
-                        className={`border ${
-                            errors[`attributes.${index}.value`]
-                                ? "border-red-500"
-                                : "border-gray-300"
-                        } rounded px-4 py-2 mr-2`}
-                    />
-                    <button
-                        type="button"
+                    <div>
+                        <input type="hidden" name={`attributes[${index}][id]`} value={attr.id} />
+
+                        {/* Dropdown for selecting attribute */}
+                        <select
+                            value={attr.attribute_id || ""}
+                            onChange={(e) =>
+                                handleAttributeChange(
+                                    index,
+                                    "attribute_id",
+                                    e.target.value
+                                )
+                            }
+                            name={`attributes[${index}][attribute_id]`}
+                            className={`border ${
+                                errors[`attributes.${index}.attribute_id`]
+                                    ? "border-red-500"
+                                    : "border-gray-300"
+                            } rounded px-4 py-2 mr-2`}
+                        >
+                            <option value="">Select Attribute</option>
+                            {attributes.map((attribute) => (
+                                <option key={attribute.id} value={attribute.id}>
+                                    {attribute.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        {errors[`attributes.${index}.attribute_id`] && (
+                            <p className="text-red-500 text-sm">
+                                {errors[`attributes.${index}.attribute_id`][0]}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        {/* Input field for attribute value */}
+                        <input
+                            type="text"
+                            value={attr.value || ""}
+                            onChange={(e) =>
+                                handleAttributeChange(
+                                    index,
+                                    "value",
+                                    e.target.value
+                                )
+                            }
+                            name={`attributes[${index}][value]`}
+                            placeholder="Value"
+                            className={`border ${
+                                errors[`attributes.${index}.value`]
+                                    ? "border-red-500"
+                                    : "border-gray-300"
+                            } rounded px-4 py-2 mr-2`}
+                        />
+
+                        {errors[`attributes.${index}.value`] && (
+                            <p className="text-red-500 text-sm">
+                                {errors[`attributes.${index}.value`][0]}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Remove button */}
+                    <SecondaryButton
                         onClick={() => removeAttribute(index)}
-                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        type="button"
                     >
                         Remove
-                    </button>
-                    {errors[`attributes.${index}.id`] && (
-                        <p className="text-red-500 text-sm">
-                            {errors[`attributes.${index}.id`][0]}
-                        </p>
-                    )}
-                    {errors[`attributes.${index}.value`] && (
-                        <p className="text-red-500 text-sm">
-                            {errors[`attributes.${index}.value`][0]}
-                        </p>
-                    )}
+                    </SecondaryButton>
                 </div>
             ))}
 
+            {/* Add button */}
             {selectedAttributes.length < attributes.length && (
-                <button
-                    type="button"
-                    onClick={addAttribute}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
+                <PrimaryButton onClick={addAttribute} type="button">
                     Add Attribute
-                </button>
+                </PrimaryButton>
             )}
         </div>
     );

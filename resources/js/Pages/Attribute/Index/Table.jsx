@@ -1,4 +1,5 @@
 import NavLink from "@/Components/NavLink";
+import { decodeHtmlEntities } from "@/utils/helpers";
 import { useForm } from "@inertiajs/react";
 import React from "react";
 
@@ -6,13 +7,15 @@ const Table = ({ attributes }) => {
     const { delete: destroy } = useForm({});
 
     const handleDelete = (attributeId) => {
-        if(!attributeId) return false;
+        if (!attributeId) return false;
 
-        const confimation = confirm('Are you sure want to delete? This process is irreversible.');
-        if(confimation) {
-            destroy(route('attributes.delete', attributeId));
+        const confimation = confirm(
+            "Are you sure want to delete? This process is irreversible."
+        );
+        if (confimation) {
+            destroy(route("attributes.delete", attributeId));
         }
-    }
+    };
 
     return (
         <>
@@ -24,10 +27,12 @@ const Table = ({ attributes }) => {
             </div>
 
             {/* No results found */}
-            {!attributes.total && <h1 className="text-center">No attributes found!</h1>}
+            {!attributes.total && (
+                <h1 className="text-center">No attributes found!</h1>
+            )}
 
             {/* Table Section */}
-            {attributes.total && (
+            {attributes.total > 0 && (
                 <>
                     <input
                         type="text"
@@ -36,11 +41,17 @@ const Table = ({ attributes }) => {
                     />
 
                     <div className="overflow-x-auto">
-                        <table className="min-w-full border-collapse border border-gray-300">
+                        <table className="min-w-full border-collapse border border-gray-300 mt-1">
                             <thead>
                                 <tr className="bg-gray-200">
                                     <th className="border border-gray-300 px-4 py-2 text-left">
+                                        Id
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2 text-left">
                                         Name
+                                    </th>
+                                    <th className="border border-gray-300 px-4 py-2 text-center">
+                                        Actions
                                     </th>
                                 </tr>
                             </thead>
@@ -52,13 +63,16 @@ const Table = ({ attributes }) => {
                                         className="odd:bg-white even:bg-gray-100"
                                     >
                                         <td className="border border-gray-300 px-4 py-2">
+                                            {attribute.id}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
                                             {attribute.name}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2 text-center">
-                                            <button
-                                                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2"
-                                            >
-                                                <NavLink href={`/attributes/show/${attribute.id}`}>
+                                            <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2">
+                                                <NavLink
+                                                    href={`/attributes/show/${attribute.id}`}
+                                                >
                                                     Edit
                                                 </NavLink>
                                             </button>
@@ -85,9 +99,13 @@ const Table = ({ attributes }) => {
                                 key={index}
                                 href={link.url}
                                 active={link.active}
-                                className={!link.active ? 'pointer-events-none cursor-not-allowed opacity-50' : ''}
+                                className={
+                                    !link.active
+                                        ? "pointer-events-none cursor-not-allowed opacity-50"
+                                        : ""
+                                }
                             >
-                                {link.label}
+                                {decodeHtmlEntities(link.label)}
                             </NavLink>
                         ))}
                     </div>

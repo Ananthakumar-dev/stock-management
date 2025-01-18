@@ -45,15 +45,16 @@ class InventoryService
         $users = DB::table('users')
             ->select([
                 'id',
-                DB::raw("CONCAT(name, ' ', id) AS name")
+                DB::raw("CONCAT(name, ' ', '- (', id, ')') AS name")
             ])
+            ->where([ 'type' => 'User' ])
             ->get();
 
         // stores
         $stores = DB::table('stores')
             ->select([
                 'id',
-                DB::raw("CONCAT(name, ' ', id) AS name")
+                DB::raw("CONCAT(name, ' ', '- (', id, ')') AS name")
             ])
             ->get();
 
@@ -61,7 +62,7 @@ class InventoryService
         $items = DB::table('items')
             ->select([
                 'id',
-                DB::raw("CONCAT(name, ' ', id) AS name")
+                DB::raw("CONCAT(name, ' ', '- (', id, ')') AS name")
             ])
             ->get();
 
@@ -84,11 +85,15 @@ class InventoryService
     public function getItemDetails(
         $itemId
     ) {
-        $item = Item::with([
-            'measurement',
-            'item_attributes',
-            'item_attributes.attribute',
-        ])
+        $item = Item::select([
+                'id',
+                'measurement_id'
+            ])
+            ->with([
+                'measurement',
+                'item_attributes',
+                'item_attributes.attribute',
+            ])
             ->where(['id' => $itemId])
             ->first();
 

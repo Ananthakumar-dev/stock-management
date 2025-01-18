@@ -27,7 +27,7 @@ const Table = ({ inventories }) => {
             {!inventories.total && <h1 className="text-center">No inventories found!</h1>}
 
             {/* Table Section */}
-            {inventories.total && (
+            {inventories.total > 0 && (
                 <>
                     <input
                         type="text"
@@ -35,7 +35,7 @@ const Table = ({ inventories }) => {
                         className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     />
 
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto mt-1">
                         <table className="min-w-full border-collapse border border-gray-300">
                             <thead>
                                 <tr className="bg-gray-200">

@@ -9,8 +9,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const inventoryBasicDataUrl = route("inventories.basicData");
-const inventoryStoreUrl = route('inventories.store');
-const inventoryIndexUrl = route('inventories.index');
+const inventoryStoreUrl = route("inventories.store");
+const inventoryIndexUrl = route("inventories.index");
 
 const Form = () => {
     const [data, setData] = useState({
@@ -82,7 +82,7 @@ const Form = () => {
             });
             setItemDetails(null);
 
-            router.visit(inventoryIndexUrl)
+            router.visit(inventoryIndexUrl);
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors); // Capture validation errors
@@ -184,10 +184,11 @@ const Form = () => {
                         <p className="text-sm text-gray-700 dark:text-gray-300">
                             <strong>Attributes:</strong>{" "}
                             <a
-                                href="javascript:;"
-                                onClick={() =>
-                                    setShowAttributes(!showAttributes)
-                                }
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setShowAttributes(!showAttributes);
+                                }}
                             >
                                 Show
                             </a>
@@ -247,17 +248,19 @@ const Form = () => {
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                             Item Attributes
                         </h2>
-                        {itemDetails.item_attributes ? (
+                        {itemDetails.item_attributes.length > 0 ? (
                             <ul className="space-y-2">
-                                {itemDetails.item_attributes.map((attr, index) => (
-                                    <li
-                                        key={index}
-                                        className="text-gray-700 dark:text-gray-300 flex justify-between"
-                                    >
-                                        <span>{attr.attribute?.name}</span>
-                                        <span>{attr.value}</span>
-                                    </li>
-                                ))}
+                                {itemDetails.item_attributes.map(
+                                    (attr, index) => (
+                                        <li
+                                            key={index}
+                                            className="text-gray-700 dark:text-gray-300 flex justify-between"
+                                        >
+                                            <span>{attr.attribute?.name}</span>
+                                            <span>{attr.value}</span>
+                                        </li>
+                                    )
+                                )}
                             </ul>
                         ) : (
                             <p className="text-gray-700 dark:text-gray-300">

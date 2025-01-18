@@ -37,18 +37,12 @@ class AuthenticatedSessionController extends Controller
 
         // validate if the user found
         if(!$user->count()) {
-            return [
-                'status' => false,
-                'message' => 'User not found'
-            ];
+            return back();
         }
 
         // validate if user is admin
         if($user->first()->type !== self::ADMIN) {
-            return [
-                'status' => false,
-                'message' => 'Only admin can able to logging'
-            ];
+            return back();
         }
         
         // authenticate the user
