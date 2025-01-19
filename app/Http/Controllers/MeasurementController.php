@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\MeasurementRequest;
 use App\Http\Requests\MeasurementUpdateRequest;
+use App\Models\Item;
 use App\Models\Measurement;
 use App\Services\MeasurementService;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class MeasurementController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%$search%");
             })
+            ->orderBy('id', 'DESC')
             ->paginate(PAGINATION)
             ->withQueryString();
 
@@ -43,7 +45,7 @@ class MeasurementController extends Controller
 
         Measurement::create($validatedFields);
 
-        return redirect()->route('measurements.index');
+        return redirect()->route('measurements.index')->with('success', 'Measurement created successfully');
     }
 
     public function show(
@@ -65,7 +67,7 @@ class MeasurementController extends Controller
         $measurement = Measurement::findOrFail($id);
         $measurement->update($validatedFields);
 
-        return redirect()->route('measurements.index');
+        return redirect()->route('measurements.index')->with('success', 'Measurement updated successfully');
     }
 
     public function destroy($id)
@@ -73,6 +75,11 @@ class MeasurementController extends Controller
         $measurement = Measurement::findOrFail($id);
         $measurement->delete();
 
-        return redirect()->route('measurements.index');
+        $item = Item::where('measurement_id', $id);
+        if ($item->count()) {
+            return back()->with('error', 'Cannot delete measurement. Items is associated with this measurement.');
+        }
+
+        return back()->with('success', 'Item deleted successfully');
     }
 }

@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ItemRequest;
+use App\Models\Inventory;
 use App\Models\Item;
 use App\Services\ItemService;
 use App\Services\MeasurementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -26,6 +28,7 @@ class ItemController extends Controller
                 $query->where('items.name', 'like', "%$search%")
                     ->orWhere('quantity', 'like', "%$search%");
             })
+            ->orderBy('id', 'DESC')
             ->paginate(PAGINATION)
             ->withQueryString();
 
@@ -54,7 +57,8 @@ class ItemController extends Controller
         $validatedFields = $itemRequest->validated();
         $itemService->store($validatedFields);
 
-        return redirect()->route('items.index');
+        Session::flash('success', 'Item created successfully');
+        return true;
     }
 
     public function show(
@@ -82,6 +86,7 @@ class ItemController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'quantity' => 'required|integer|min:0',
+            'availability' => 'required|integer',
             'measurement_id' => 'required|exists:measurements,id',
             'attributes' => 'nullable|array',
             'attributes.*.attribute_id' => [
@@ -108,14 +113,20 @@ class ItemController extends Controller
 
         $itemService->update($validatedFields, $id);
 
+        Session::flash('success', 'Item updated successfully');
         return true;
     }
 
     public function destroy($id)
     {
         $item = Item::findOrFail($id);
+
+        $inventory = Inventory::where('item_id', $id);
+        if ($inventory->count()) {
+            return back()->with('error', 'Cannot delete item. Inventory is associated with this item.');
+        }
         $item->delete();
 
-        return redirect()->route('items.index');
+        return back()->with('success', 'Item deleted successfully');
     }
 }

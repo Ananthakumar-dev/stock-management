@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRequest;
+use App\Models\Inventory;
 use App\Models\Store;
 use App\Services\StoreService;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ class StoreController extends Controller
                 $query->where('name', 'like', "%$search%")
                     ->orWhere('phone', 'like', "%$search%");
             })
+            ->orderBy('id', 'DESC')
             ->paginate(PAGINATION)
             ->withQueryString();
 
@@ -57,7 +59,7 @@ class StoreController extends Controller
             )
         );
 
-        return redirect()->route('stores.index');
+        return redirect()->route('stores.index')->with('success', 'Store created successfully');
     }
 
     public function show(
@@ -89,14 +91,20 @@ class StoreController extends Controller
             )
         );
 
-        return redirect()->route('stores.index');
+        return redirect()->route('stores.index')->with('success', 'Store updated successfully');
     }
 
     public function destroy($id)
     {
         $store = Store::findOrFail($id);
+
+        $inventory = Inventory::where('store_id', $id);
+        if ($inventory->count()) {
+            return back()->with('error', 'Cannot delete store. Inventory is associated with this store.');
+        }
+
         $store->delete();
 
-        return redirect()->route('stores.index');
+        return back()->with('success', 'Store deleted successfully');
     }
 }

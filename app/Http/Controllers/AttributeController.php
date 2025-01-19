@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AttributeRequest;
 use App\Http\Requests\AttributeUpdateRequest;
 use App\Models\Attribute;
+use App\Models\ItemAttribute;
 use App\Services\AttributeService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -22,6 +23,7 @@ class AttributeController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%$search%");
             })
+            ->orderBy('id', 'DESC')
             ->paginate(PAGINATION)
             ->withQueryString();
 
@@ -43,7 +45,7 @@ class AttributeController extends Controller
 
         Attribute::create($validatedFields);
 
-        return redirect()->route('attributes.index');
+        return redirect()->route('attributes.index')->with('success', 'Attribute created successfully');
     }
 
     public function show(
@@ -65,15 +67,21 @@ class AttributeController extends Controller
         $Attribute = Attribute::findOrFail($id);
         $Attribute->update($validatedFields);
 
-        return redirect()->route('attributes.index');
+        return redirect()->route('attributes.index')->with('success', 'Attribute updated successfully');
     }
 
     public function destroy($id)
     {
         $Attribute = Attribute::findOrFail($id);
+
+        $item_attributes = ItemAttribute::where('attribute_id', $id);
+        if ($item_attributes->count()) {
+            return back()->with('error', 'Cannot delete attribute. Items is associated with this attribute.');
+        }
+
         $Attribute->delete();
 
-        return redirect()->route('attributes.index');
+        return back()->with('success', 'Attribute deleted successfully');
     }
 
     public function get(

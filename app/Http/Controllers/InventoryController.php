@@ -7,6 +7,7 @@ use App\Http\Requests\InventoryRequest;
 use App\Models\Inventory;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 class InventoryController extends Controller
@@ -32,6 +33,7 @@ class InventoryController extends Controller
                     ->orWhere('stores.name', 'like', "%$search%")
                     ->orWhere('users.name', 'like', "%$search%");
             })
+            ->orderBy('inventories.id', 'DESC')
             ->paginate(PAGINATION)
             ->withQueryString();
 
@@ -52,6 +54,7 @@ class InventoryController extends Controller
         $validatedFields = $inventoryRequest->validated();
         $this->inventoryService->store($validatedFields);
 
+        Session::flash('success', 'Inventory created successfully');
         return true;
     }
 
@@ -69,8 +72,9 @@ class InventoryController extends Controller
         $id
     ) {
         $validatedFields = $inventoryRequest->validated();
-        $inventory = $this->inventoryService->updateInventory($validatedFields, $id);
+        $this->inventoryService->updateInventory($validatedFields, $id);
 
+        Session::flash('success', 'Inventory updated successfully');
         return true;
     }
 
@@ -96,6 +100,6 @@ class InventoryController extends Controller
         // Delete the inventory record
         $inventory->delete();
 
-        return redirect()->route('inventories.index');
+        return back()->with('success', 'Inventory deleted successfully');
     }
 }

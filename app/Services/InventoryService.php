@@ -41,13 +41,15 @@ class InventoryService
      */
     public function getBasicData()
     {
+        $addInventory = !request()->query('editable');
+
         // users
         $users = DB::table('users')
             ->select([
                 'id',
                 DB::raw("CONCAT(name, ' ', '- (', id, ')') AS name")
             ])
-            ->where([ 'type' => 'User' ])
+            ->where(['type' => 'User', 'status' => 'Active'])
             ->get();
 
         // stores
@@ -64,6 +66,9 @@ class InventoryService
                 'id',
                 DB::raw("CONCAT(name, ' ', '- (', id, ')') AS name")
             ])
+            ->when($addInventory, function ($q) {
+                $q->where('availability', 1);
+            })
             ->get();
 
         // types
@@ -86,9 +91,9 @@ class InventoryService
         $itemId
     ) {
         $item = Item::select([
-                'id',
-                'measurement_id'
-            ])
+            'id',
+            'measurement_id'
+        ])
             ->with([
                 'measurement',
                 'item_attributes',
@@ -152,7 +157,7 @@ class InventoryService
             'quantity' => DB::raw("quantity " . ($type === 'In' ? '+' : '-') . " $quantity")
         ]);
 
-        Inventory::where([ 'id' => $inventoryId ])->update($validatedFields);
+        Inventory::where(['id' => $inventoryId])->update($validatedFields);
 
         return true;
     }

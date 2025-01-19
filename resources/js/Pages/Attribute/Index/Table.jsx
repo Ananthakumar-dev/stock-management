@@ -27,6 +27,10 @@ const Table = ({ attributes, initialSearch }) => {
                 </NavLink>
             </div>
 
+            <div>
+                <Filter initialSearch={initialSearch} />
+            </div>
+
             {/* No results found */}
             {!attributes.total && (
                 <h1 className="text-center">No attributes found!</h1>
@@ -35,8 +39,6 @@ const Table = ({ attributes, initialSearch }) => {
             {/* Table Section */}
             {attributes.total > 0 && (
                 <>
-                    <Filter initialSearch={initialSearch} />
-
                     <div className="overflow-x-auto">
                         <table className="min-w-full border-collapse border border-gray-300 mt-1">
                             <thead>

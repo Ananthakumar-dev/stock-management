@@ -8,21 +8,25 @@ const Table = ({ items, initialSearch }) => {
     const { delete: destroy } = useForm({});
 
     const handleDelete = (itemId) => {
-        if(!itemId) return false;
+        if (!itemId) return false;
 
-        const confimation = confirm('Are you sure want to delete? This process is irreversible.');
-        if(confimation) {
-            destroy(route('items.delete', itemId));
+        const confimation = confirm(
+            "Are you sure want to delete? This process is irreversible."
+        );
+        if (confimation) {
+            destroy(route("items.delete", itemId));
         }
-    }
+    };
 
     return (
         <>
             {/* Top section: Add button and search box */}
             <div className="text-right">
-                <NavLink href={route("items.create")}>
-                    Add Item
-                </NavLink>
+                <NavLink href={route("items.create")}>Add Item</NavLink>
+            </div>
+
+            <div>
+                <Filter initialSearch={initialSearch} />
             </div>
 
             {/* No results found */}
@@ -31,14 +35,13 @@ const Table = ({ items, initialSearch }) => {
             {/* Table Section */}
             {items.total > 0 && (
                 <>
-                    <div>
-                        <Filter initialSearch={initialSearch} />
-                    </div>
-
                     <div className="overflow-x-auto mt-1">
                         <table className="min-w-full border-collapse border border-gray-300">
                             <thead>
                                 <tr className="bg-gray-200">
+                                    <th className="border border-gray-300 px-4 py-2 text-left">
+                                        Id
+                                    </th>
                                     <th className="border border-gray-300 px-4 py-2 text-left">
                                         Name
                                     </th>
@@ -61,22 +64,28 @@ const Table = ({ items, initialSearch }) => {
                                         className="odd:bg-white even:bg-gray-100"
                                     >
                                         <td className="border border-gray-300 px-4 py-2">
+                                            {item.id}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
                                             {item.name}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {item.quantity} {item.measurement_name}
+                                            {item.quantity}{" "}
+                                            {item.measurement_name}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {item.availability == 1 ? 'Available' : 'Not Available'}
+                                            {item.availability == 1
+                                                ? "Available"
+                                                : "Not Available"}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2 text-center">
-                                            <button
-                                                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2"
+                                            <NavLink
+                                                href={`/items/show/${item.id}`}
                                             >
-                                                <NavLink href={`/items/show/${item.id}`}>
+                                                <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2">
                                                     Edit
-                                                </NavLink>
-                                            </button>
+                                                </button>
+                                            </NavLink>
 
                                             <button
                                                 onClick={() =>
@@ -100,7 +109,11 @@ const Table = ({ items, initialSearch }) => {
                                 key={index}
                                 href={link.url}
                                 active={link.active}
-                                className={!link.url ? 'pointer-events-none cursor-not-allowed opacity-50' : ''}
+                                className={
+                                    !link.url
+                                        ? "pointer-events-none cursor-not-allowed opacity-50"
+                                        : ""
+                                }
                             >
                                 {decodeHtmlEntities(link.label)}
                             </NavLink>

@@ -25,16 +25,16 @@ const Table = ({ stores, initialSearch }) => {
                 <NavLink href={route("stores.create")}>Add Store</NavLink>
             </div>
 
+            <div>
+                <Filter initialSearch={initialSearch} />
+            </div>
+
             {/* No results found */}
             {!stores.total && <h1 className="text-center">No stores found!</h1>}
 
             {/* Table Section */}
             {stores.total > 0 && (
                 <>
-                    <div>
-                        <Filter initialSearch={initialSearch} />
-                    </div>
-
                     <div className="overflow-x-auto mt-1">
                         <table className="min-w-full border-collapse border border-gray-300">
                             <thead>

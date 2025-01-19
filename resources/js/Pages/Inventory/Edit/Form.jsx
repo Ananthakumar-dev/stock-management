@@ -4,7 +4,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { router } from "@inertiajs/react";
 
-const inventoryBasicDataUrl = route("inventories.basicData");
+const inventoryBasicDataUrl = route("inventories.basicData", {
+    editable: true,
+});
 const inventoryIndexUrl = route("inventories.index");
 
 const Form = ({ inventory }) => {

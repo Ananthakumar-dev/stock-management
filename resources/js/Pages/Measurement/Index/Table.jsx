@@ -27,6 +27,10 @@ const Table = ({ measurements, initialSearch }) => {
                 </NavLink>
             </div>
 
+            <div>
+                <Filter initialSearch={initialSearch} />
+            </div>
+
             {/* No results found */}
             {!measurements.total && (
                 <h1 className="text-center">No measurements found!</h1>
@@ -35,10 +39,6 @@ const Table = ({ measurements, initialSearch }) => {
             {/* Table Section */}
             {measurements.total > 0 && (
                 <>
-                    <div>
-                        <Filter initialSearch={initialSearch} />
-                    </div>
-
                     <div className="overflow-x-auto mt-1">
                         <table className="min-w-full border-collapse border border-gray-300">
                             <thead>

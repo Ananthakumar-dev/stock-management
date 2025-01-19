@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Status;
 use App\Enums\UserType;
 use App\Http\Requests\UserRequest;
+use App\Models\Inventory;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -30,6 +31,7 @@ class UserController extends Controller
                     ->orWhere('phone', 'like', "%$search%");
             })
             ->where('type', UserType::User)
+            ->orderBy('id', 'DESC')
             ->paginate(PAGINATION)
             ->withQueryString();
 
@@ -57,7 +59,7 @@ class UserController extends Controller
         $validatedFields = $userRequest->validated();
         User::create($validatedFields);
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')->with('success', 'User added successfully');
     }
 
     public function show(
@@ -81,14 +83,20 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->update($validatedFields);
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
 
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+
+        $inventory = Inventory::where('user_id', $id);
+        if ($inventory->count()) {
+            return back()->with('error', 'Cannot delete user. Inventory is associated with this user.');
+        }
+
         $user->delete();
 
-        return redirect()->route('users.index');
+        return back()->with('success', 'User deleted successfully');
     }
 }

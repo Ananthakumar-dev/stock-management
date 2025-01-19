@@ -27,6 +27,10 @@ const Table = ({ inventories, initialSearch }) => {
                 </NavLink>
             </div>
 
+            <div>
+                <Filter initialSearch={initialSearch} />
+            </div>
+
             {/* No results found */}
             {!inventories.total && (
                 <h1 className="text-center">No inventories found!</h1>
@@ -35,14 +39,13 @@ const Table = ({ inventories, initialSearch }) => {
             {/* Table Section */}
             {inventories.total > 0 && (
                 <>
-                    <div>
-                        <Filter initialSearch={initialSearch} />
-                    </div>
-
                     <div className="overflow-x-auto mt-1">
                         <table className="min-w-full border-collapse border border-gray-300">
                             <thead>
                                 <tr className="bg-gray-200">
+                                    <th className="border border-gray-300 px-4 py-2 text-left">
+                                        Id
+                                    </th>
                                     <th className="border border-gray-300 px-4 py-2 text-left">
                                         Item Name
                                     </th>
@@ -70,6 +73,9 @@ const Table = ({ inventories, initialSearch }) => {
                                         key={inventory.id}
                                         className="odd:bg-white even:bg-gray-100"
                                     >
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {inventory.id}
+                                        </td>
                                         <td className="border border-gray-300 px-4 py-2">
                                             {inventory.item_name}
                                         </td>
