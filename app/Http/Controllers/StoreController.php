@@ -6,6 +6,7 @@ use App\Http\Requests\StoreRequest;
 use App\Models\Inventory;
 use App\Models\Store;
 use App\Services\StoreService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
@@ -45,19 +46,23 @@ class StoreController extends Controller
     public function store(
         StoreRequest $storeRequest
     ) {
-        $validatedFields = $storeRequest->validated();
-        $validatedFields['address'] = [
-            'block' => $validatedFields['block'],
-            'street' => $validatedFields['street'],
-            'city' => $validatedFields['city'],
-        ];
+        try {
+            $validatedFields = $storeRequest->validated();
+            $validatedFields['address'] = [
+                'block' => $validatedFields['block'],
+                'street' => $validatedFields['street'],
+                'city' => $validatedFields['city'],
+            ];
 
-        Store::create(
-            Arr::only(
-                $validatedFields,
-                ['name', 'description', 'address', 'phone']
-            )
-        );
+            Store::create(
+                Arr::only(
+                    $validatedFields,
+                    ['name', 'description', 'address', 'phone']
+                )
+            );
+        } catch (Exception $e) {
+            return redirect()->route('stores.index')->with('error', 'Something went wrong');
+        }
 
         return redirect()->route('stores.index')->with('success', 'Store created successfully');
     }
@@ -76,34 +81,42 @@ class StoreController extends Controller
         StoreRequest $storeRequest,
         $id
     ) {
-        $validatedFields = $storeRequest->validated();
-        $validatedFields['address'] = [
-            'block' => $validatedFields['block'],
-            'street' => $validatedFields['street'],
-            'city' => $validatedFields['city'],
-        ];
+        try {
+            $validatedFields = $storeRequest->validated();
+            $validatedFields['address'] = [
+                'block' => $validatedFields['block'],
+                'street' => $validatedFields['street'],
+                'city' => $validatedFields['city'],
+            ];
 
-        $store = Store::findOrFail($id);
-        $store->update(
-            Arr::only(
-                $validatedFields,
-                ['name', 'description', 'address', 'phone']
-            )
-        );
+            $store = Store::findOrFail($id);
+            $store->update(
+                Arr::only(
+                    $validatedFields,
+                    ['name', 'description', 'address', 'phone']
+                )
+            );
+        } catch (Exception $e) {
+            return redirect()->route('stores.index')->with('error', 'Something went wrong');
+        }
 
         return redirect()->route('stores.index')->with('success', 'Store updated successfully');
     }
 
     public function destroy($id)
     {
-        $store = Store::findOrFail($id);
+        try {
+            $store = Store::findOrFail($id);
 
-        $inventory = Inventory::where('store_id', $id);
-        if ($inventory->count()) {
-            return back()->with('error', 'Cannot delete store. Inventory is associated with this store.');
+            $inventory = Inventory::where('store_id', $id);
+            if ($inventory->count()) {
+                return back()->with('error', 'Cannot delete store. Inventory is associated with this store.');
+            }
+
+            $store->delete();
+        } catch (Exception $e) {
+            return back()->with('error', 'Something went wrong');
         }
-
-        $store->delete();
 
         return back()->with('success', 'Store deleted successfully');
     }

@@ -8,6 +8,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\Inventory;
 use App\Models\User;
 use App\Services\UserService;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -56,8 +57,12 @@ class UserController extends Controller
     public function store(
         UserRequest $userRequest
     ) {
-        $validatedFields = $userRequest->validated();
-        User::create($validatedFields);
+        try {
+            $validatedFields = $userRequest->validated();
+            User::create($validatedFields);
+        } catch (Exception $e) {
+            return redirect()->route('users.index')->with('error', 'Something went wrong');
+        }
 
         return redirect()->route('users.index')->with('success', 'User added successfully');
     }
@@ -78,24 +83,32 @@ class UserController extends Controller
         UserRequest $userRequest,
         $id
     ) {
-        $validatedFields = $userRequest->validated();
+        try {
+            $validatedFields = $userRequest->validated();
 
-        $user = User::findOrFail($id);
-        $user->update($validatedFields);
+            $user = User::findOrFail($id);
+            $user->update($validatedFields);
+        } catch (Exception $e) {
+            return redirect()->route('users.index')->with('error', 'Something went wrong');
+        }
 
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        try {
+            $user = User::findOrFail($id);
 
-        $inventory = Inventory::where('user_id', $id);
-        if ($inventory->count()) {
-            return back()->with('error', 'Cannot delete user. Inventory is associated with this user.');
+            $inventory = Inventory::where('user_id', $id);
+            if ($inventory->count()) {
+                return back()->with('error', 'Cannot delete user. Inventory is associated with this user.');
+            }
+
+            $user->delete();
+        } catch (Exception $e) {
+            return back()->with('error', 'Something went wrong');
         }
-
-        $user->delete();
 
         return back()->with('success', 'User deleted successfully');
     }

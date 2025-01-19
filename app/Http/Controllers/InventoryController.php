@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\InventoryRequest;
 use App\Models\Inventory;
 use App\Services\InventoryService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
@@ -51,8 +52,12 @@ class InventoryController extends Controller
     public function store(
         InventoryRequest $inventoryRequest
     ) {
-        $validatedFields = $inventoryRequest->validated();
-        $this->inventoryService->store($validatedFields);
+        try {
+            $validatedFields = $inventoryRequest->validated();
+            $this->inventoryService->store($validatedFields);
+        } catch (Exception $e) {
+            return false;
+        }
 
         Session::flash('success', 'Inventory created successfully');
         return true;
@@ -71,10 +76,15 @@ class InventoryController extends Controller
         InventoryRequest $inventoryRequest,
         $id
     ) {
-        $validatedFields = $inventoryRequest->validated();
-        $this->inventoryService->updateInventory($validatedFields, $id);
+        try {
+            $validatedFields = $inventoryRequest->validated();
+            $this->inventoryService->updateInventory($validatedFields, $id);
+    
+            Session::flash('success', 'Inventory updated successfully');
+        } catch (Exception $e) {
+            return false;
+        }
 
-        Session::flash('success', 'Inventory updated successfully');
         return true;
     }
 
@@ -94,11 +104,15 @@ class InventoryController extends Controller
 
     public function destroy($id)
     {
-        // Find the inventory record
-        $inventory = Inventory::findOrFail($id);
-
-        // Delete the inventory record
-        $inventory->delete();
+        try {
+            // Find the inventory record
+            $inventory = Inventory::findOrFail($id);
+    
+            // Delete the inventory record
+            $inventory->delete();
+        } catch (Exception $e) {
+            return back()->with('error', 'Something went wrong');
+        }
 
         return back()->with('success', 'Inventory deleted successfully');
     }

@@ -7,6 +7,7 @@ use App\Http\Requests\MeasurementUpdateRequest;
 use App\Models\Item;
 use App\Models\Measurement;
 use App\Services\MeasurementService;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -41,9 +42,13 @@ class MeasurementController extends Controller
     public function store(
         MeasurementRequest $measurementRequest
     ) {
-        $validatedFields = $measurementRequest->validated();
+        try {
+            $validatedFields = $measurementRequest->validated();
 
-        Measurement::create($validatedFields);
+            Measurement::create($validatedFields);
+        } catch (Exception $e) {
+            return redirect()->route('measurements.index')->with('error', 'Something went wrong');
+        }
 
         return redirect()->route('measurements.index')->with('success', 'Measurement created successfully');
     }
@@ -62,22 +67,31 @@ class MeasurementController extends Controller
         MeasurementUpdateRequest $measurementUpdateRequest,
         $id
     ) {
-        $validatedFields = $measurementUpdateRequest->validated();
-
-        $measurement = Measurement::findOrFail($id);
-        $measurement->update($validatedFields);
+        try {
+            $validatedFields = $measurementUpdateRequest->validated();
+    
+            $measurement = Measurement::findOrFail($id);
+            $measurement->update($validatedFields);
+        } catch (Exception $e) {
+            return redirect()->route('measurements.index')->with('error', 'Something went wrong');
+        }
 
         return redirect()->route('measurements.index')->with('success', 'Measurement updated successfully');
     }
 
     public function destroy($id)
     {
-        $measurement = Measurement::findOrFail($id);
-        $measurement->delete();
+        try {
+            $measurement = Measurement::findOrFail($id);
+    
+            $item = Item::where('measurement_id', $id);
+            if ($item->count()) {
+                return back()->with('error', 'Cannot delete measurement. Items is associated with this measurement.');
+            }
 
-        $item = Item::where('measurement_id', $id);
-        if ($item->count()) {
-            return back()->with('error', 'Cannot delete measurement. Items is associated with this measurement.');
+            $measurement->delete();
+        } catch (Exception $e) {
+            return back()->with('error', 'Something went wrong');
         }
 
         return back()->with('success', 'Item deleted successfully');

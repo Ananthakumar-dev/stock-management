@@ -39,7 +39,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         <main className="mt-6">
                             <div>
-                                <h1 className="text-center text-white">
+                                <h1 className="text-center">
                                     Stock Management
                                 </h1>
                             </div>

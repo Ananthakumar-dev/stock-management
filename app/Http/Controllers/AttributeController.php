@@ -7,6 +7,7 @@ use App\Http\Requests\AttributeUpdateRequest;
 use App\Models\Attribute;
 use App\Models\ItemAttribute;
 use App\Services\AttributeService;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -41,9 +42,13 @@ class AttributeController extends Controller
     public function store(
         AttributeRequest $attributeRequest
     ) {
-        $validatedFields = $attributeRequest->validated();
+        try {
+            $validatedFields = $attributeRequest->validated();
 
-        Attribute::create($validatedFields);
+            Attribute::create($validatedFields);
+        } catch (Exception $e) {
+            return redirect()->route('attributes.index')->with('error', 'Something went wrong');
+        }
 
         return redirect()->route('attributes.index')->with('success', 'Attribute created successfully');
     }
@@ -62,24 +67,32 @@ class AttributeController extends Controller
         AttributeUpdateRequest $attributeUpdateRequest,
         $id
     ) {
-        $validatedFields = $attributeUpdateRequest->validated();
-
-        $Attribute = Attribute::findOrFail($id);
-        $Attribute->update($validatedFields);
+        try {
+            $validatedFields = $attributeUpdateRequest->validated();
+    
+            $Attribute = Attribute::findOrFail($id);
+            $Attribute->update($validatedFields);
+        } catch (Exception $e) {
+            return redirect()->route('attributes.index')->with('error', 'Something went wrong');
+        }
 
         return redirect()->route('attributes.index')->with('success', 'Attribute updated successfully');
     }
 
     public function destroy($id)
     {
-        $Attribute = Attribute::findOrFail($id);
-
-        $item_attributes = ItemAttribute::where('attribute_id', $id);
-        if ($item_attributes->count()) {
-            return back()->with('error', 'Cannot delete attribute. Items is associated with this attribute.');
+        try {
+            $Attribute = Attribute::findOrFail($id);
+    
+            $item_attributes = ItemAttribute::where('attribute_id', $id);
+            if ($item_attributes->count()) {
+                return back()->with('error', 'Cannot delete attribute. Items is associated with this attribute.');
+            }
+    
+            $Attribute->delete();
+        } catch (Exception $e) {
+            return back()->with('error', 'Something went wrong');
         }
-
-        $Attribute->delete();
 
         return back()->with('success', 'Attribute deleted successfully');
     }

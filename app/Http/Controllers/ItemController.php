@@ -8,6 +8,7 @@ use App\Models\Inventory;
 use App\Models\Item;
 use App\Services\ItemService;
 use App\Services\MeasurementService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -54,10 +55,15 @@ class ItemController extends Controller
         ItemRequest $itemRequest,
         ItemService $itemService
     ) {
-        $validatedFields = $itemRequest->validated();
-        $itemService->store($validatedFields);
+        try {
+            $validatedFields = $itemRequest->validated();
+            $itemService->store($validatedFields);
 
-        Session::flash('success', 'Item created successfully');
+            Session::flash('success', 'Item created successfully');
+        } catch (Exception $e) {
+            return false;
+        }
+
         return true;
     }
 
@@ -111,7 +117,11 @@ class ItemController extends Controller
             'attributes.*.value' => 'required|string|max:255',
         ]);
 
-        $itemService->update($validatedFields, $id);
+        try {
+            $itemService->update($validatedFields, $id);
+        } catch (Exception $e) {
+            return false;
+        }
 
         Session::flash('success', 'Item updated successfully');
         return true;
@@ -119,13 +129,17 @@ class ItemController extends Controller
 
     public function destroy($id)
     {
-        $item = Item::findOrFail($id);
+        try {
+            $item = Item::findOrFail($id);
 
-        $inventory = Inventory::where('item_id', $id);
-        if ($inventory->count()) {
-            return back()->with('error', 'Cannot delete item. Inventory is associated with this item.');
+            $inventory = Inventory::where('item_id', $id);
+            if ($inventory->count()) {
+                return back()->with('error', 'Cannot delete item. Inventory is associated with this item.');
+            }
+            $item->delete();
+        } catch (Exception $e) {
+            return back()->with('error', 'Something went wrong');
         }
-        $item->delete();
 
         return back()->with('success', 'Item deleted successfully');
     }
