@@ -15,14 +15,23 @@ use Inertia\Inertia;
 class ItemController extends Controller
 {
     public function index(
-        ItemService $itemService
+        ItemService $itemService,
+        Request $request
     ) {
+        $search = $request->query('search');
+
         $allItems = $itemService
             ->getItems()
-            ->paginate(PAGINATION);
+            ->when($search, function ($query, $search) {
+                $query->where('items.name', 'like', "%$search%")
+                    ->orWhere('quantity', 'like', "%$search%");
+            })
+            ->paginate(PAGINATION)
+            ->withQueryString();
 
         return Inertia::render('Item/Index/Index', [
-            'items' => $allItems
+            'items' => $allItems,
+            'initialSearch' => $search
         ]);
     }
 

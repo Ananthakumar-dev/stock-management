@@ -12,18 +12,27 @@ use Inertia\Inertia;
 class AttributeController extends Controller
 {
     public function index(
-        AttributeService $attributeService
+        AttributeService $attributeService,
+        Request $request
     ) {
+        $search = $request->query('search');
+
         $allAttributes = $attributeService
             ->getAttributes()
-            ->paginate(PAGINATION);
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%$search%");
+            })
+            ->paginate(PAGINATION)
+            ->withQueryString();
 
         return Inertia::render('Attribute/Index/Index', [
-            'attributes' => $allAttributes
+            'attributes' => $allAttributes,
+            'initialSearch' => $search
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         return Inertia::render('Attribute/Add/Index');
     }
 
@@ -69,8 +78,7 @@ class AttributeController extends Controller
 
     public function get(
         AttributeService $attributeService
-    )
-    {
+    ) {
         $allAttributes = $attributeService
             ->getAttributes()
             ->get();

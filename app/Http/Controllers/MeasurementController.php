@@ -12,18 +12,27 @@ use Inertia\Inertia;
 class MeasurementController extends Controller
 {
     public function index(
-        MeasurementService $measurementService
+        MeasurementService $measurementService,
+        Request $request
     ) {
+        $search = $request->query('search');
+
         $allMeasurements = $measurementService
             ->getMeasurements()
-            ->paginate(PAGINATION);
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%$search%");
+            })
+            ->paginate(PAGINATION)
+            ->withQueryString();
 
         return Inertia::render('Measurement/Index/Index', [
-            'measurements' => $allMeasurements
+            'measurements' => $allMeasurements,
+            'initialSearch' => $search
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         return Inertia::render('Measurement/Add/Index');
     }
 
@@ -48,10 +57,9 @@ class MeasurementController extends Controller
     }
 
     public function update(
-        MeasurementUpdateRequest $measurementUpdateRequest, 
+        MeasurementUpdateRequest $measurementUpdateRequest,
         $id
-    )
-    {
+    ) {
         $validatedFields = $measurementUpdateRequest->validated();
 
         $measurement = Measurement::findOrFail($id);

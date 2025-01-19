@@ -16,15 +16,26 @@ class UserController extends Controller
      * index page
      */
     public function index(
-        UserService $userService
+        UserService $userService,
+        Request $request
     ) {
+        $search = $request->query('search');
+
         $allUsers = $userService
             ->getUsers()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%")
+                    ->orWhere('designation', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%");
+            })
             ->where('type', UserType::User)
-            ->paginate(PAGINATION);
+            ->paginate(PAGINATION)
+            ->withQueryString();
 
         return Inertia::render('User/Index/Index', [
-            'users' => $allUsers
+            'users' => $allUsers,
+            'initialSearch' => $search
         ]);
     }
 

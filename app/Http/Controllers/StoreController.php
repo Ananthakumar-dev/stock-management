@@ -12,14 +12,23 @@ use Inertia\Inertia;
 class StoreController extends Controller
 {
     public function index(
-        StoreService $storeService
+        StoreService $storeService,
+        Request $request
     ) {
+        $search = $request->query('search');
+
         $allStores = $storeService
             ->getStores()
-            ->paginate(PAGINATION);
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%");
+            })
+            ->paginate(PAGINATION)
+            ->withQueryString();
 
         return Inertia::render('Store/Index/Index', [
-            'stores' => $allStores
+            'stores' => $allStores,
+            'initialSearch' => $search
         ]);
     }
 

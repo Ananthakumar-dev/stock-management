@@ -2,8 +2,9 @@ import NavLink from "@/Components/NavLink";
 import { decodeHtmlEntities } from "@/utils/helpers";
 import { useForm } from "@inertiajs/react";
 import React from "react";
+import Filter from "./Filter";
 
-const Table = ({ items }) => {
+const Table = ({ items, initialSearch }) => {
     const { delete: destroy } = useForm({});
 
     const handleDelete = (itemId) => {
@@ -30,11 +31,9 @@ const Table = ({ items }) => {
             {/* Table Section */}
             {items.total > 0 && (
                 <>
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
+                    <div>
+                        <Filter initialSearch={initialSearch} />
+                    </div>
 
                     <div className="overflow-x-auto mt-1">
                         <table className="min-w-full border-collapse border border-gray-300">
@@ -101,7 +100,7 @@ const Table = ({ items }) => {
                                 key={index}
                                 href={link.url}
                                 active={link.active}
-                                className={!link.active ? 'pointer-events-none cursor-not-allowed opacity-50' : ''}
+                                className={!link.url ? 'pointer-events-none cursor-not-allowed opacity-50' : ''}
                             >
                                 {decodeHtmlEntities(link.label)}
                             </NavLink>

@@ -18,14 +18,26 @@ class InventoryController extends Controller
         //
     }
 
-    public function index()
-    {
+    public function index(
+        Request $request
+    ) {
+        $search = $request->query('search');
+
         $allInventories = $this->inventoryService
             ->getInventories()
-            ->paginate(PAGINATION);
+            ->when($search, function ($query, $search) {
+                $query->where('items.name', 'like', "%$search%")
+                    ->orWhere('inventories.quantity', 'like', "%$search%")
+                    ->orWhere('inventories.type', 'like', "%$search%")
+                    ->orWhere('stores.name', 'like', "%$search%")
+                    ->orWhere('users.name', 'like', "%$search%");
+            })
+            ->paginate(PAGINATION)
+            ->withQueryString();
 
         return Inertia::render('Inventory/Index/Index', [
-            'inventories' => $allInventories
+            'inventories' => $allInventories,
+            'initialSearch' => $search
         ]);
     }
 

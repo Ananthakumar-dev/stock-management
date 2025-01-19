@@ -2,8 +2,9 @@ import NavLink from "@/Components/NavLink";
 import { decodeHtmlEntities } from "@/utils/helpers";
 import { useForm } from "@inertiajs/react";
 import React from "react";
+import Filter from "./Filter";
 
-const Table = ({ attributes }) => {
+const Table = ({ attributes, initialSearch }) => {
     const { delete: destroy } = useForm({});
 
     const handleDelete = (attributeId) => {
@@ -34,11 +35,7 @@ const Table = ({ attributes }) => {
             {/* Table Section */}
             {attributes.total > 0 && (
                 <>
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
+                    <Filter initialSearch={initialSearch} />
 
                     <div className="overflow-x-auto">
                         <table className="min-w-full border-collapse border border-gray-300 mt-1">
@@ -69,13 +66,13 @@ const Table = ({ attributes }) => {
                                             {attribute.name}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2 text-center">
-                                            <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2">
-                                                <NavLink
-                                                    href={`/attributes/show/${attribute.id}`}
-                                                >
+                                            <NavLink
+                                                href={`/attributes/show/${attribute.id}`}
+                                            >
+                                                <button className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2">
                                                     Edit
-                                                </NavLink>
-                                            </button>
+                                                </button>
+                                            </NavLink>
 
                                             <button
                                                 onClick={() =>
@@ -100,7 +97,7 @@ const Table = ({ attributes }) => {
                                 href={link.url}
                                 active={link.active}
                                 className={
-                                    !link.active
+                                    !link.url
                                         ? "pointer-events-none cursor-not-allowed opacity-50"
                                         : ""
                                 }

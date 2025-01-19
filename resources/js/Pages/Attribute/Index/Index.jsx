@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import Table from './Table';
 
-export default function Index({ attributes }) {
+export default function Index({ attributes, initialSearch }) {
     return (
         <AuthenticatedLayout
             header={
@@ -18,7 +18,7 @@ export default function Index({ attributes }) {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             {/* here add needed design */}
-                            <Table attributes={attributes} />
+                            <Table attributes={attributes} initialSearch={initialSearch} />
                         </div>
                     </div>
                 </div>
